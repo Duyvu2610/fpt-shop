@@ -70,7 +70,8 @@ const LoaiSPPage: React.FC = () => {
     try {
       const response = await baseAxios.post<LoaiSP>('LoaiSP/save', {
         ten: newCategory.ten,
-        trangThai: newCategory.trangThai,
+        idLoaiSPCha: newCategory.idLoaiSPCha,
+        trangThai: 1,
       });
       if (response.data) {
         notification.success({
@@ -269,13 +270,16 @@ const LoaiSPPage: React.FC = () => {
               onChange={(e) => setNewCategory({ ...newCategory, ten: e.target.value })}
             />
           </Form.Item>
-          <Form.Item name="trangThai" label="Trạng thái" rules={[{ required: true }]}>
+          <Form.Item name="idLoaiSPCha" label="Ten Loai SP Cha" rules={[{ required: true }]}>
             <Select
-              value={newCategory?.trangThai}
-              onChange={(value) => setNewCategory({ ...newCategory!, trangThai: value })}
+              value={newCategory?.idLoaiSPCha}
+              onChange={(value) => setNewCategory({ ...newCategory!, idLoaiSPCha: value })}
             >
-              <Select.Option value={1}>Hoạt động</Select.Option>
-              <Select.Option value={0}>Không hoạt động</Select.Option>
+              {data.map((item) => (
+                <Select.Option key={item.id} value={item.id}>
+                  {item.ten}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
         </Form>
