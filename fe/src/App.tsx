@@ -10,7 +10,7 @@ import { RootState } from "./redux/store";
 import { privateRoutes, publicRoutes } from "./routes";
 
 function App() {
-  const user = useSelector((state: RootState) => state.auth.currentUser);
+  const isAdmin = localStorage.getItem("role") === "admin";
   const loading = useSelector((state: RootState) => state.app.loading);
  
   return (
@@ -40,7 +40,7 @@ function App() {
               key={index}
               path={route.path}
               element={
-                <PrivateRoute auth={{ isAuthenticated: user !== null }}>
+                <PrivateRoute auth={{ isAuthenticated: isAdmin }}>
                   <Layout>
                     <Page />
                   </Layout>

@@ -1,21 +1,12 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
 
-import { baseAxios, callApi, getCartByUser, payCart } from "../../api/axios";
+import {callApi, getCartByUser} from "../../api/axios";
 import { Emitter as emitter } from "../../eventEmitter/EventEmitter";
-import { RootState } from "../../redux/store";
-import { CardInfo, GetCartReponseDto } from "../../types/types";
-import { addListCartPay } from "../../redux/appSlice";
+import {GetCartReponseDto } from "../../types/types";
 
 import CartDetail from "./CartDetail";
 import Button from "../../components/Button";
-
-import routes from "../../config/routes";
-
-import { useTranslation } from "react-i18next";
 import PaymentForm from "./PaymentForm ";
 function CartPage() {
   const [products, setProducts] = useState<GetCartReponseDto[]>([]);
@@ -29,9 +20,9 @@ function CartPage() {
 
   useEffect(() => {
     const fecth = async () => {
-      userId
-        ? setProducts(await callApi(() => getCartByUser(userId)))
-        : setProducts([]);
+      const a = await getCartByUser(userId);
+      console.log(a);
+      setProducts(a)
     };
     fecth();
     window.scrollTo(0, 0);
@@ -39,6 +30,7 @@ function CartPage() {
 
   useEffect(() => {
     const handleChecked = (element: GetCartReponseDto) => {
+      console.log(element);
       setTotalCard((prevQuantity) => prevQuantity + element.quantity);
       setTotalPrice((prevPrice) => prevPrice + element.price);
       setListCartPay((prev) => {
@@ -86,39 +78,6 @@ function CartPage() {
   };
 
   const handleBuyProduct = async () => {
-    // if (products.length === 0) return;
-    // if (listCartPay.length === 0) {
-    //   toast.error("Vui lòng chọn sản phẩm để mua");
-    //   return;
-    // }
-    // const fecth = async () => {
-    //   try {
-    //     await callApi(() => payCart(listCartPay));
-    //     setIsRerender(prev => !prev);
-    //     setTotalCard(0);
-    //     setTotalPrice(0);
-    //     setIsChecked(false);
-    //     dispatch(addListCartPay(listCartPay))
-    //     navigate(routes.thank);
-    //     emitter.emit("updateCartNumber");
-    //   } catch (error) {
-    //     toast.error("Số lượng mua vượt quá số lượng trong kho");
-    //   }
-    // }
-    // fecth();
-    //   baseAxios.post("/vnPay", {
-    //     "OrderType": "billpayment", // Loại đơn hàng
-    //     "Amount": totalPrice, // Số tiền thanh toán (VNĐ)
-    //     "OrderDescription": "Thanh toán hóa đơn mua hàng", // Mô tả đơn hàng
-    //     "Name": "Nguyen Van A" // Tên khách hàng
-    // }).then((res) => {
-    //     console.log(res.data);
-    //       window.location.href = res.data;
-    //       dispatch(addListCartPay(listCartPay));
-    //       // navigate(routes.thank);
-    //   }).catch((err) => {
-    //     console.log(err);
-    // });
   };
 
   return (
@@ -182,7 +141,7 @@ function CartPage() {
                 </form>
                 <h3 className="font-bold text-lg">Điền thông tin thanh toán</h3>
                 <p className="py-4">
-                  <PaymentForm total={totalPrice} idCardDetail={listCartPay.map(item => item.idCartDeatail).toString()}/>
+                  <PaymentForm total={totalPrice} idCardDetail={listCartPay.map(item => item.idCartDeatail).toString()} listCartItem={listCartPay}/>
                 </p>
               </div>
             </dialog>

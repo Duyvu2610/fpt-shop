@@ -7,7 +7,6 @@ import { Emitter as emitter } from "../../eventEmitter/EventEmitter";
 import { GetCartReponseDto } from "../../types/types";
 
 import ActiveQuantity from "../../components/ActiveQuantity";
-import routes from "../../config/routes";
 
 interface CartDetailProps {
   getCardReponseDto: GetCartReponseDto;
@@ -17,7 +16,6 @@ interface CartDetailProps {
 const CartDetail = (props: CartDetailProps) => {
   const [quantity, setQuantity] = useState<number>(props.getCardReponseDto.quantity);
   const [checked, setChecked] = useState<boolean>(false);
-  const navigate = useNavigate();
 
 
   const prevCheckedRef = useRef(checked);
@@ -49,7 +47,8 @@ const CartDetail = (props: CartDetailProps) => {
         id: props.getCardReponseDto.cartId,
         productId: props.getCardReponseDto.productId,
         productName: props.getCardReponseDto.productName,
-        idCartDeatail: props.getCardReponseDto.idCartDeatail
+        idCartDeatail: props.getCardReponseDto.idCartDeatail,
+        idChiTietSP: props.getCardReponseDto.idChiTietSP
       });
     } else if (quantity !== prevQuantity) {
       if (checked) {
@@ -59,7 +58,8 @@ const CartDetail = (props: CartDetailProps) => {
           id: props.getCardReponseDto.cartId,
           productId: props.getCardReponseDto.productId,
           productName: props.getCardReponseDto.productName,
-          idCartDeatail: props.getCardReponseDto.idCartDeatail
+          idCartDeatail: props.getCardReponseDto.idCartDeatail,
+          idChiTietSP: props.getCardReponseDto.idChiTietSP
         });
       }
     }

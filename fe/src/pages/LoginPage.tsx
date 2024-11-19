@@ -2,12 +2,11 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Login } from "../types/types";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { callApi, loginUser } from "../api/axios";
+import { baseAxios, callApi, loginUser } from "../api/axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/authSlice";
 import routes from "../config/routes";
-import { useTranslation } from "react-i18next";
 
 
 interface Errors {
@@ -16,7 +15,7 @@ interface Errors {
 
 function LoginPage() {
   const [isShowPassword, setIsShowPassword] = useState<boolean>(true);
-  const {t} = useTranslation();
+  const [role, setRole] = useState<string>("1");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [formValues, setFormValues] = useState<Login>({
@@ -46,17 +45,37 @@ function LoginPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      setFormValues({
-        email: "",
-        password: "",
-      });
+    if (role === "1") {
       try {
-        const data = await callApi(() => loginUser(formValues));
-        dispatch(loginSuccess(data));
-        navigate(routes.home);
-      } catch (error) {
+        const res = await baseAxios.get("/QuanLyNguoiDung/DangNhap", {
+          params: {
+            lg: formValues.email,
+            password: formValues.password,
+          },
+        });
+        localStorage.setItem("role", "admin");
+        localStorage.setItem("userId", res.data.id);
+        toast.success("Đăng nhập thành công");
+        setTimeout(() => {
+          window.location.href = "/admin/ban-hang";
+        }, 1000);
+        
+      } catch (err) {
         toast.error("Đăng nhập thất bại");
+      }
+    } else {
+      if (validate()) {
+        setFormValues({
+          email: "",
+          password: "",
+        });
+        try {
+          const data = await callApi(() => loginUser(formValues));
+          dispatch(loginSuccess(data));
+          navigate(routes.home);
+        } catch (error) {
+          toast.error("Đăng nhập thất bại");
+        }
       }
     }
   };
@@ -78,6 +97,10 @@ function LoginPage() {
           Đăng nhập để tiếp tục sử dụng dịch vụ của chúng tôi
           </p>
           <form onSubmit={handleSubmit}>
+            <select value={role} onChange={(e) => setRole(e.target.value)}>
+              <option value="1">Admin</option>
+              <option value="2">User</option>
+            </select>
             <div className="space-y-4 mt-8">
               <input
                 type="text"

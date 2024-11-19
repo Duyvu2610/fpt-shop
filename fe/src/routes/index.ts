@@ -1,3 +1,4 @@
+import path from "path";
 import config from "../config";
 import DefaultLayout from "../layouts/DefaultLayout";
 import SimpleHeaderLayout from "../layouts/SimpleHeaderLayout";
@@ -14,6 +15,16 @@ import ProductDetail from "../pages/ProductDetail/ProductDetail";
 import ResetPassword from "../pages/ResetPassword/ResetPassword";
 import SignUpPage from "../pages/SignUpPage";
 import ThankYou from "../pages/ThankYou/ThankYou";
+import KhachHangPage from "../pages/KhachHang/KhachHangPage";
+import AdminLayout from "../layouts/AdminLayout";
+import NhanVienPage from "../pages/NhanVienPage";
+import MauSacPage from "../pages/MauSacPage";
+import KichCoPage from "../pages/KichCoPage";
+import ChatLieuPage from "../pages/ChatLieuPage";
+import LoaiSPPage from "../pages/LoaiSPPage";
+import SanPhamPage from "../pages/SanPhamPage/SanPhamPage";
+import QuanLyHoaDon from "../pages/QuanLyHoaDon/QuanLyHoaDon";
+import SellingPage from "../pages/BanHang/BanHang";
 
 const publicRoutes = [
   { path: config.routes.home, component: Home, layout: DefaultLayout },
@@ -45,8 +56,21 @@ const publicRoutes = [
     layout: DefaultLayout,
   },
   { path: config.routes["page-not-found"], component: PageNotFound },
+  
 ];
 
-const privateRoutes: any[] = [];
+const privateRoutes: any[] = [
+  {path: config.routes.adminKhachHang , component: KhachHangPage, layout: AdminLayout},
+  {path: config.routes.adminNhanVien , component: NhanVienPage, layout: AdminLayout},
+  {path: config.routes.adminMauSac , component: MauSacPage, layout: AdminLayout},
+  {path: config.routes.adminKichCo , component: KichCoPage, layout: AdminLayout},
+  {path: config.routes.adminChatLieu , component: ChatLieuPage, layout: AdminLayout},
+  {path: config.routes.adminLoaiSanPham , component: LoaiSPPage, layout: AdminLayout},
+  {path: config.routes.adminSanPham , component: SanPhamPage, layout: AdminLayout},
+  {path: config.routes.adminHoaDon , component: QuanLyHoaDon, layout: AdminLayout},
+  {path: config.routes.adminBanHang , component: SellingPage, layout: AdminLayout},
+
+  
+];
 
 export { publicRoutes, privateRoutes };

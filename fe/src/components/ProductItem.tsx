@@ -17,7 +17,6 @@ interface ProductItemProps {
 }
 
 const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
-  const {t} = useTranslation();
   const [loaded, setLoaded] = useState(false);
   const [isCallApi, setIsCallApi] = useState(false);
   const currentUser = localStorage.getItem("userId") || "";
@@ -29,9 +28,9 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
       try {
         setIsCallApi(() => true)
         await addToCart({
-          productId: product.idChiTietSanPham,
-          userId: currentUser,
-          quantity: 1,
+          soLuong: 1,
+          idctsp: product.idChiTietSanPham || undefined,
+          idNguoiDung: currentUser
         });
         Emitter.emit("updateCartNumber");
         toast.success("Bạn đã thêm sản phẩm thành công!");

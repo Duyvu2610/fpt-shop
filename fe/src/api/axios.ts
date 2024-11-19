@@ -2,7 +2,7 @@ import axios from "axios";
 import { getDispatch } from "../utils/helper";
 import { fetchEnd, fetchStart } from "../redux/appSlice";
 
-import { Login, SignUpInfo, Cart, CartItem, ReviewRequestDto, CartRequestDto, GetUserInfoDto, CardInfo, Review, Product } from "../types/types";
+import { Login, SignUpInfo, Cart, CartItem, ReviewRequestDto, CartRequestDto, GetUserInfoDto, CardInfo, Review, Product, GetCartReponseDto } from "../types/types";
 import { logOutSuccess, loginSuccess } from "../redux/authSlice";
 import Swal from "sweetalert2";
 
@@ -105,7 +105,18 @@ export const updateCartItem = async (
 export const getAllProduct = async (idLoai: string|null): Promise<Product[]> => {
   try {
     const res = await baseAxios.get("SanPham/getAll", { params: { idLoai } });
-    return res.data;
+    const products: Product[] = res.data;
+    // Filter out products with duplicate IDs
+    const uniqueProducts = products.reduce((acc: Product[], current: Product) => {
+      const x = acc.find(item => item.id === current.id);
+      if (!x) {
+        return acc.concat([current]);
+      } else {
+        return acc;
+      }
+    }, []);
+
+    return uniqueProducts;
   } catch (error) {
     return Promise.reject(error);
   }
@@ -176,7 +187,7 @@ export const getTopReview = async (limit:number): Promise<Review[]|null> => {
 
 export const addToCart = async (cartRequestDto: CartRequestDto) => {
   try {
-    const res = await baseAxios.post("carts", cartRequestDto);
+    const res = await baseAxios.post("GioHang/AddCart", cartRequestDto);
     return res.data;
   } catch (error) {
     return Promise.reject(error);
@@ -185,7 +196,7 @@ export const addToCart = async (cartRequestDto: CartRequestDto) => {
 
 export const getCartByUser = async (id?: string) => {
   try {
-    const res = await baseAxios.get(`carts/${id}`);
+    const res = await baseAxios.get<GetCartReponseDto[]>(`carts/${id}`);
     return res.data;
   } catch (error) {
     return Promise.reject(error);

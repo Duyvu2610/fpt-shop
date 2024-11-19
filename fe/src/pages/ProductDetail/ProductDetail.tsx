@@ -3,99 +3,53 @@ import { AiTwotoneLike } from "react-icons/ai";
 import { BsClockHistory } from "react-icons/bs";
 import { CiShoppingCart, CiViewList } from "react-icons/ci";
 import { FaAngleDown, FaEdit, FaShippingFast, FaUser } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
+
 import {
   addToCart,
+  baseAxios,
   callApi,
-  editReview,
   getAllProduct,
   getProduct,
   registerReview,
 } from "../../api/axios";
 import ActiveQuantity from "../../components/ActiveQuantity";
 import Button from "../../components/Button";
-import Pagianate from "../../components/PagianateNavBar/Paginate";
 import ProductItem from "../../components/ProductItem";
 import StarRating from "../../components/StarRating";
-import ActiveStarRating from "../../components/StarRatingActive";
 import Title from "../../components/Title";
 import routes from "../../config/routes";
-import { Product, Review, ReviewRequestDto } from "../../types/types";
-import { convertLocalDateTimeToDate } from "../../utils/helper";
+import {
+  Product,
+  ProductDetail as MyProduct,
+  Review,
+  ReviewRequestDto,
+} from "../../types/types";
 import { Emitter } from "../../eventEmitter/EventEmitter";
 import Markdown from "react-markdown";
 import SkeletonLoader from "./SkeletonLoader";
+import { SwiperSlide, Swiper } from "swiper/react";
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 
 interface Props {}
 
 function ProductDetail(_props: Props) {
   const { id } = useParams();
   const [quantity, setQuantity] = useState<number>(1);
-  const [reviews, setReviews] = useState<Array<Review>>([]);
-  const formReview = useRef<HTMLFormElement>(null);
   const detailH = useRef<HTMLDivElement | null>(null);
   const expandIconRef = useRef<HTMLDivElement | null>(null);
-  const [loaded, setLoaded] = useState(false);
   // page use for review
-  const [page, setPage] = useState<number>(0);
-  const textReview = useRef<HTMLTextAreaElement>(null);
-  const submitReview = useRef<HTMLButtonElement>(null);
-  const numberOfPage = 5;
   const user: string = localStorage.getItem("userId") || "";
 
-  const [rating, setRating] = useState(5);
-  const navigate = useNavigate();
 
-  const MySwal = withReactContent(Swal);
+  const [chiTietSanPham, setChiTietSanPham] = useState<MyProduct>();
 
-  const showEditReview = (
-    originReview: string | null,
-    originalRating: number | null
-  ) => {
-    function handleEditRating(rating: number): void {
-      if (document.getElementById("swal-input2")) {
-        const input = document.getElementById(
-          "swal-input2"
-        ) as HTMLInputElement;
-        input.value = rating.toString();
-      }
-    }
-
-    return MySwal.fire({
-      title: (
-        <>
-          <p>Edit review</p>
-          <ActiveStarRating
-            rating={originalRating || 1}
-            setRating={handleEditRating}
-            className=""
-          />
-        </>
-      ),
-      html: '<input id="swal-input2" hidden class="swal2-input"></input>',
-      input: "textarea",
-      inputValue: originReview,
-      inputAttributes: {
-        required: "true",
-      },
-      showCancelButton: true,
-      confirmButtonText: "Edit review",
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      preConfirm: () => {
-        const content = Swal.getInput()?.value;
-        const editRating = Swal.getPopup()!.querySelector(
-          "#swal-input2"
-        ) as HTMLInputElement;
-
-        return { content, editRating: editRating.value };
-      },
-    });
-  };
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedIDCTSP, setselectedIDCTSP] = useState<string | null>(null);
+  const [quantityProduct, setQuantityProduct] = useState<number | null>(null);
 
   const handleChangeDetailHeight = () => {
     if (detailH.current) {
@@ -109,6 +63,14 @@ function ProductDetail(_props: Props) {
     }
   };
 
+  const fetchChiTietSanPham = async () => {
+    const result = await baseAxios.get(
+      "SanPham/GetAllChiTietSanPhamHome?idSanPham=" + id
+    );
+    console.log(result.data);
+    setChiTietSanPham(result.data);
+  };
+
   const handleQuantityChange = (newQuantity: number) => {
     setQuantity(newQuantity);
   };
@@ -117,15 +79,17 @@ function ProductDetail(_props: Props) {
 
   useEffect(() => {
     const fetchData = async () => {
-        const result: Product[] = await callApi(() => getAllProduct("00000000-0000-0000-0000-000000000000"));
-        result.sort((a, b) => {
-            return new Date(b.ngayTao).getTime() - new Date(a.ngayTao).getTime();
-        });
-        setTopSelling(result.slice(0, 5));
+      const result: Product[] = await callApi(() =>
+        getAllProduct("00000000-0000-0000-0000-000000000000")
+      );
+      result.sort((a, b) => {
+        return new Date(b.ngayTao).getTime() - new Date(a.ngayTao).getTime();
+      });
+      setTopSelling(result.slice(0, 5));
     };
 
     fetchData();
-}, []);
+  }, [id]);
 
   const showSwal = () => {
     return Swal.fire({
@@ -146,81 +110,39 @@ function ProductDetail(_props: Props) {
         const product = await getProduct(id);
         setData(product);
       }
-      // const topSellingProduct = await getBestSeller();
-      // setTopSelling(topSellingProduct);
     };
 
     fetchProduct();
+    fetchChiTietSanPham();
   }, [id]);
 
-  // useEffect(() => {
-  //   const fetchReviews = async () => {
-  //     const result: Review[] = await getReviewsByProductId(Number(id));
-  //     setReviews(result);
-  //   };
-  //   fetchReviews();
-  // }, []);
+  useEffect(() => {
+    if (selectedColor && selectedSize && data && chiTietSanPham) {
+      const chiTiet = chiTietSanPham.chiTietSanPhams.find(
+        (item) => item.mauSac === selectedColor && item.kichCo === selectedSize
+      );
+      setQuantityProduct(chiTiet ? chiTiet.soLuong : 0);
+      setselectedIDCTSP(chiTiet ? chiTiet.id : null);
+    }
+  }, [selectedColor, selectedSize, data]);
 
   function handleAddToCart() {
     const addCart = async () => {
       addToCart({
-        productId: data?.idChiTietSanPham,
-        userId: user,
-        quantity: quantity,
+        soLuong: quantity,
+        idctsp: selectedIDCTSP || undefined,
+        idNguoiDung: user
       })
         .then(() => {
           Emitter.emit("updateCartNumber");
           toast.success("Bạn đã thêm sản phẩm thành công!");
         })
         .catch((error: any) => {
-
-            toast.error("Thêm sản phẩm thất bại!");
+          toast.error("Thêm sản phẩm thất bại!");
         });
-      
     };
     addCart();
   }
-  async function handleSubmitReviews(
-    event: FormEvent<HTMLFormElement>
-  ): Promise<void> {
-    event.preventDefault();
-
-    if (!textReview.current?.value.trim()) {
-      textReview.current?.setCustomValidity(
-        "Content must be at least 1 character diff space"
-      );
-      return;
-    }
-
-    if (!user) {
-      showSwal().then((value) => {
-        if (value.isConfirmed) {
-          navigate(routes.login);
-        }
-      });
-      return;
-    }
-
-    const data: ReviewRequestDto = {
-      productId:
-        formReview.current && Number(formReview.current.productId.value),
-      userId: formReview.current && Number(formReview.current.userId.value),
-      rating: rating,
-      content: textReview.current.value,
-    };
-
-    await registerReview(data).then((data) => {
-      if (data) {
-        toast.success("Review successfully!");
-        if (textReview.current) {
-          textReview.current.value = "";
-        }
-        setReviews((prev) => [data, ...prev]);
-      }
-    });
-  }
-
-  console.log(data);
 
   return (
     <div className="mb-[124px]">
@@ -228,15 +150,12 @@ function ProductDetail(_props: Props) {
         <div className="flex flex-col lg:flex-row gap-14 mt-9 pb-8">
           {data ? (
             <>
-              <div className=" w-[300px] mx-auto grid place-items-center">
-                <img
-                  src={data?.image}
-                  alt=""
-                  onLoad={() => setLoaded(true)}
-                  className={`w-full rounded-[20px] ${
-                    loaded ? "opacity-100" : "opacity-0"
-                  } transition-opacity duration-500`}
-                />
+              <div className="w-[300px] mx-auto grid place-items-center">
+                      <img
+                        src={chiTietSanPham?.anhs[0].duongDan}
+                        alt=""
+                        className="bg-cover"
+                      />
               </div>
 
               <div className="flex-1">
@@ -251,9 +170,60 @@ function ProductDetail(_props: Props) {
                 <span className="my-3 block  text-[32px]">
                   {data?.giaGoc} VND
                 </span>
+                <p className="text-[#003b31] font-semibold pb-4 flex gap-2">
+                  Màu sắc
+                  <ul className="flex gap-4">
+                    {chiTietSanPham?.mauSacs.map((mauSac) => (
+                      <li
+                        key={mauSac.id}
+                        style={{ display: "flex", alignItems: "center" }}
+                        onClick={() => setSelectedColor(mauSac.id)}
+                      >
+                        <span
+                          className={`hover:scale-110 transition-all duration-300 ${
+                            selectedColor === mauSac.id ? "scale-125" : ""
+                          }`}
+                          style={{
+                            display: "inline-block",
+                            width: "30px",
+                            height: "30px",
+                            backgroundColor: mauSac.giaTri,
+                            border: "1px solid #000",
+                            borderRadius: "8px",
+                            marginRight: "8px",
+                          }}
+                        ></span>
+                      </li>
+                    ))}
+                  </ul>
+                </p>
+
+                <p className="text-[#003b31] font-semibold pb-4 flex gap-2 items-center">
+                  Kích thước
+                  <ul className="flex gap-2">
+                    {chiTietSanPham?.kichCos.map((kichCo) => (
+                      <li
+                        key={kichCo.id}
+                        onClick={() => setSelectedSize(kichCo.id)}
+                        className={`border py-2 px-4 rounded-lg hover:scale-110 transition-all duration-300 cursor-pointer ${
+                          selectedSize === kichCo.id
+                            ? "bg-[#003b31] text-white"
+                            : "border-[#003b31]"
+                        }`}
+                      >
+                        {kichCo.giaTri}
+                      </li>
+                    ))}
+                  </ul>
+                </p>
+
                 <p className="text-[#003b31] font-semibold pb-4">
                   Số lượng còn lại:{" "}
-                  <span className="font-normal">{data.soLuong}</span>
+                  <span className="font-normal">
+                    {quantityProduct !== null
+                      ? quantityProduct
+                      : "Vui lòng chọn màu sắc và kích thước"}
+                  </span>
                 </p>
 
                 <div className="flex items-center gap-4 pt-4">
@@ -316,13 +286,12 @@ function ProductDetail(_props: Props) {
             onClick={handleChangeDetailHeight}
           />
         </div>
-
-        {/* Review */}
-        
       </div>
 
       {/* Top selling */}
-      <Title className="text-center text-[24px] lg:text-[40px] my-[64px] uppercase">Sản phẩm khác</Title>
+      <Title className="text-center text-[24px] lg:text-[40px] my-[64px] uppercase">
+        Sản phẩm khác
+      </Title>
       <div className="mt-[60px] wrapper">
         <ul className="flex-1 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid gap-10 auto-rows-max">
           {topSelling.slice(0, 12).map((product, index) => (

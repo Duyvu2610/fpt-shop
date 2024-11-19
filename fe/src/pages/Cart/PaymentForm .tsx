@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { baseAxios } from "../../api/axios";
+import { CartItem, GetCartReponseDto } from "../../types/types";
+import { toast } from "react-toastify";
 
 interface PaymentFormValues {
   name: string;
@@ -15,9 +17,10 @@ interface PaymentFormValues {
 interface PaymentFormProps {
   total: number;
   idCardDetail: string;
+  listCartItem: Array<GetCartReponseDto>;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ total, idCardDetail }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ total, idCardDetail, listCartItem }) => {
   const [initialValues, setInitialValues] = useState<PaymentFormValues>({
     name: "",
     email: "",
@@ -26,6 +29,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ total, idCardDetail }) => {
     paymentMethod: "COD",
     idCardDetail
   });
+
+  const idU = localStorage.getItem("userId") || "";
 
   useEffect(() => {
     async function fetchUser() {
@@ -65,7 +70,34 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ total, idCardDetail }) => {
     enableReinitialize: true, // Cho phép reinitialize
     validationSchema,
     onSubmit: (values) => {
-      console.log("Thông tin thanh toán:", values);
+      if (values.paymentMethod === "COD") {
+        console.log(listCartItem);
+        const a = {
+          chiTietHoaDons: listCartItem.map((item) => ({
+            idChiTietSanPham: item.idChiTietSP,
+            soLuong: item.quantity,
+            giaBan: item.price,
+          })),
+          ten: values.name,
+          sdt: values.phone,
+          email: values.email,
+          phuongThucThanhToan: "COD",
+          diaChi: "string",
+          tienShip: "30000",
+          tongTien: total,
+          idNguoiDung: idU,
+          ngayThanhToan: new Date().toISOString().split('T')[0],
+          trangThai: 6,
+        }
+        baseAxios.post("HoaDon", a).then(async (res) => {
+          await toast.success("Thanh toán thành công");
+          window.location.reload();
+        }).catch((err) => {
+          toast.error("Thanh toán thất bại");
+        }
+        );
+        return;
+      }
       baseAxios
         .post("/vnPay", {
           OrderType: "billpayment", 

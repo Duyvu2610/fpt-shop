@@ -10,7 +10,7 @@ interface PrivateRouteProps {
 }
 
 function PrivateRoute({ auth: { isAuthenticated }, children }: PrivateRouteProps) {
-  return <>{isAuthenticated ? children : <Navigate to={routes.login} />};</>;
+  return <>{isAuthenticated ? children : <Navigate to={routes.login} />}</>;
 }
 
 export default PrivateRoute;

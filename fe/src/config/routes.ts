@@ -12,6 +12,17 @@ const routes = {
   "reset-pass": "/reset-password",
   "produc-detail": "/products/:id",
   "page-not-found": "*",
+  adminKhachHang: "/admin/khach-hang",
+  adminNhanVien: "/admin/nhan-vien",
+  adminMauSac: "/admin/mau-sac",
+  adminKichCo: "/admin/kich-co",
+  adminChatLieu: "/admin/chat-lieu",
+  adminLoaiSanPham: "/admin/loai-san-pham",
+  adminDonHang: "/admin/don-hang",
+  adminSanPham: "/admin/san-pham",
+  adminThongKe: "/admin/thong-ke",
+  adminHoaDon: "/admin/hoa-don",
+  adminBanHang: "/admin/ban-hang",
 };
 
 export default routes;

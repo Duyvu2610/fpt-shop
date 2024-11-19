@@ -1,5 +1,4 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { AiOutlineLogin } from "react-icons/ai";
 import { FaBars } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
@@ -18,12 +17,10 @@ const Navbar: FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const isLogin = localStorage.getItem("userId");
-  const { t, i18n } = useTranslation();
 
   const user: GetUserInfoDto | null = useSelector(
     (state: RootState) => state.auth.currentUser
   );
-  console.log(user);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -136,61 +133,6 @@ const Navbar: FC = () => {
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Menu mobile */}
-        <div
-          ref={menuRef}
-          className={`bg-black w-custom-width h-full text-white z-50 ${isMenuOpen ? "block fixed top-0 right-0 left-0" : "hidden"
-            }`}
-        >
-          <Link
-            to="/"
-            onClick={toggleMenu}
-            className="font-[IntegralCf] block text-[24px] py-4 px-4"
-          >
-            SEEDLING
-          </Link>
-          <ul className="space-y-2 border-b ">
-            {/* {navItems.map(({ title, to }) => (
-              <Link onClick={toggleMenu} to={to} key={to}>
-                <li className="py-3 px-4 hover:bg-[#484a4b]">{title}</li>
-              </Link>
-            ))} */}
-
-            <Link onClick={toggleMenu} to={routes.home} key={routes.home}>
-              <li className="py-3 px-4 hover:bg-[#484a4b]">{t("nav.home")}</li>
-            </Link>
-
-            <Link onClick={toggleMenu} to={routes.product} key={routes.product}>
-              <li className="py-3 px-4 hover:bg-[#484a4b]">
-                {t("nav.products")}
-              </li>
-            </Link>
-
-            <Link onClick={toggleMenu} to={routes.contact} key={routes.contact}>
-              <li className="py-3 px-4 hover:bg-[#484a4b]">
-                {t("nav.contact")}
-              </li>
-            </Link>
-          </ul>
-          {isLogin ? (
-            <button
-              onClick={logoutUser}
-              className="w-full text-left py-3 px-4 hover:bg-[#484a4b]"
-            >
-              {t("button.logout")}{" "}
-              <AiOutlineLogin className="w-6 h-6 inline-block" />
-            </button>
-          ) : (
-            <Link
-              to={"/login"}
-              className="w-full text-left py-3 px-4 hover:bg-[#484a4b] block"
-            >
-              {t("nav.login")}{" "}
-              <AiOutlineLogin className="w-6 h-6 inline-block" />
-            </Link>
-          )}
         </div>
       </div>
     </nav>
