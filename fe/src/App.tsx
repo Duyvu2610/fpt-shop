@@ -10,7 +10,7 @@ import { RootState } from "./redux/store";
 import { privateRoutes, publicRoutes } from "./routes";
 
 function App() {
-  const isAdmin = localStorage.getItem("role") === "admin";
+  const isAdmin = localStorage.getItem("role") === "admin" || localStorage.getItem("role") === "NhanVien";
   const loading = useSelector((state: RootState) => state.app.loading);
  
   return (

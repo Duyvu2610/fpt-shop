@@ -4,9 +4,7 @@ import Title from '../../components/Title';
 import { Product } from '../../types/types';
 import config from '../../config';
 import { callApi, getAllProduct } from '../../api/axios';
-import { getNewProduct } from '../../api/homeApi';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const Arrivals: React.FC = () => {
     const sampleData: Product[] = [];
@@ -14,7 +12,7 @@ const Arrivals: React.FC = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result: Product[] = await callApi(() => getAllProduct("00000000-0000-0000-0000-000000000000"));
+            const result: Product[] = await callApi(() => getAllProduct());
             result.sort((a, b) => {
                 return new Date(b.ngayTao).getTime() - new Date(a.ngayTao).getTime();
             });

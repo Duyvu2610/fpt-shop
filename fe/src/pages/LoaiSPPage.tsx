@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'; 
 import { Table, Button, Modal, Form, Input, notification, Tag, Select } from 'antd';
-import axios from 'axios';
 import { baseAxios } from '../api/axios';
 
 // Define interface for the category data
@@ -70,20 +69,20 @@ const LoaiSPPage: React.FC = () => {
     try {
       const response = await baseAxios.post<LoaiSP>('LoaiSP/save', {
         ten: newCategory.ten,
-        idLoaiSPCha: newCategory.idLoaiSPCha,
+        iDLoaiSPCha: newCategory.idLoaiSPCha,
         trangThai: 1,
       });
       if (response.data) {
         notification.success({
-          message: 'Add category successful',
-          description: 'New category has been added.',
+          message: 'Thêm loại sản phẩm thành công',
+          description: 'Loai sản phẩm mới đã được thêm vào.',
         });
         setData([response.data, ...data]);
         setFilteredData([response.data, ...filteredData]);
       }
     } catch (error: any) {
       notification.error({
-        message: 'Error adding category',
+        message: 'Lỗi thêm loại sản phẩm',
         description: error.message,
       });
     } finally {
@@ -99,20 +98,20 @@ const LoaiSPPage: React.FC = () => {
   // Table column configuration
   const columns = [
     {
-      title: 'Name',
+      title: 'Tên',
       dataIndex: 'ten',
       key: 'ten',
       render: (text: string) => <span>{text}</span>,
     },
     {
-      title: 'Status',
+      title: 'Trạng thái',
       dataIndex: 'trangThai',
       key: 'trangThai',
       render: (text: number) =>
         text === 1 ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>,
     },
     {
-      title: 'Actions',
+      title: 'Hành động',
       key: 'action',
       render: (_: any, record: LoaiSP) => (
         <>
@@ -120,7 +119,6 @@ const LoaiSPPage: React.FC = () => {
             Edit
           </Button>
           <Button danger onClick={() => showDeleteModal(record)} style={{ marginRight: 10 }}>Delete</Button>
-          <Button >Chi Tiết</Button>
         </>
       ),
     },
@@ -172,8 +170,8 @@ const LoaiSPPage: React.FC = () => {
         });
         if (response.status === 200) {
           notification.success({
-            message: 'Edit category successful',
-            description: 'Category has been updated.',
+            message: 'Cập nhật loại sản phẩm thành công',
+            description: 'Thông tin loại sản phẩm đã được cập nhật.',
           });
           const newData = data.map((item) =>
             item.id === editingCategory?.id ? { ...item, ...values } : item
@@ -183,7 +181,7 @@ const LoaiSPPage: React.FC = () => {
         }
       } catch (error: any) {
         notification.error({
-          message: 'Error editing category',
+          message: 'Lỗi cập nhật loại sản phẩm',
           description: error.message,
         });
       } finally {
@@ -202,19 +200,19 @@ const LoaiSPPage: React.FC = () => {
     <div>
       <h2>Product Categories</h2>
       <Input
-        placeholder="Search by name"
+        placeholder="Tìm kiếm loại sản phẩm"
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
         style={{ width: 300, marginBottom: 20 }}
       />
       <Button onClick={handleSearch} type="primary" style={{ marginRight: 10 }}>
-        Search
+        Tìm kiếm
       </Button>
       <Button onClick={handleReset} type="default">
-        Reset
+        Làm mới
       </Button>
       <Button onClick={showAddModal} type="primary" style={{ marginLeft: 10 }}>
-        Add New Category
+        Thêm loại sản phẩm
       </Button>
 
       <Table
@@ -261,16 +259,16 @@ const LoaiSPPage: React.FC = () => {
           onFinish={handleAddCategory}
           initialValues={{
             ten: newCategory.ten,
-            trangThai: newCategory.trangThai,
+            idLoaiSPCha: newCategory.idLoaiSPCha,
           }}
         >
-          <Form.Item name="ten" label="Name" rules={[{ required: true }]}>
+          <Form.Item name="ten" label="Tên" rules={[{ required: true }]}>
             <Input
               value={newCategory.ten}
               onChange={(e) => setNewCategory({ ...newCategory, ten: e.target.value })}
             />
           </Form.Item>
-          <Form.Item name="idLoaiSPCha" label="Ten Loai SP Cha" rules={[{ required: true }]}>
+          <Form.Item name="idLoaiSPCha" label="Tên loại sản phẩm cha" rules={[{ required: true }]}>
             <Select
               value={newCategory?.idLoaiSPCha}
               onChange={(value) => setNewCategory({ ...newCategory!, idLoaiSPCha: value })}

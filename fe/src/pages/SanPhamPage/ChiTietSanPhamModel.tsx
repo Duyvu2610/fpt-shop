@@ -8,7 +8,8 @@ const ChiTietSanPhamModel: React.FC<{
   visible: boolean;
   onClose: () => void;
   data: ChiTietSanPhamUpdateRequest;
-}> = ({ visible, onClose, data }) => {
+  onSave: () => void;
+}> = ({ visible, onClose, onSave, data }) => {
   const [dataSource, setDataSource] = useState<ChiTietSanPhamUpdateRequest>(data);
 
   useEffect(() => {
@@ -41,6 +42,7 @@ const ChiTietSanPhamModel: React.FC<{
         })),
       );
       onClose(); // Đóng modal sau khi lưu thành công
+      onSave(); // Gọi hàm onSave để cập nhật lại danh sách sản phẩm
       
     } catch (error) {
       console.error("Error saving data:", error);

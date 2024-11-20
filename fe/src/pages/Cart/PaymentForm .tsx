@@ -74,15 +74,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ total, idCardDetail, listCart
         console.log(listCartItem);
         const a = {
           chiTietHoaDons: listCartItem.map((item) => ({
-            idChiTietSanPham: item.idChiTietSP,
+            iDChiTietSanPham: item.idChiTietSP,
             soLuong: item.quantity,
-            giaBan: item.price,
+            donGia: item.price,
           })),
           ten: values.name,
           sdt: values.phone,
           email: values.email,
           phuongThucThanhToan: "COD",
-          diaChi: "string",
+          diaChi: values.address,
           tienShip: "30000",
           tongTien: total,
           idNguoiDung: idU,
@@ -98,6 +98,28 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ total, idCardDetail, listCart
         );
         return;
       }
+      const a = {
+          chiTietHoaDons: listCartItem.map((item) => ({
+            iDChiTietSanPham: item.idChiTietSP,
+            soLuong: item.quantity,
+            donGia: item.price,
+          })),
+          ten: values.name,
+          sdt: values.phone,
+          email: values.email,
+          phuongThucThanhToan: "VNPay",
+          diaChi: values.address,
+          tienShip: "30000",
+          tongTien: total,
+          idNguoiDung: idU,
+          ngayThanhToan: new Date().toISOString().split('T')[0],
+          trangThai: 6,
+        }
+        baseAxios.post("HoaDon", a).then(async (res) => {
+        }).catch((err) => {
+          toast.error("Thanh toán thất bại");
+        }
+        );
       baseAxios
         .post("/vnPay", {
           OrderType: "billpayment", 

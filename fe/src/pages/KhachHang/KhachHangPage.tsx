@@ -10,6 +10,7 @@ import {
   Tag,
   Select,
   DatePicker,
+  notification,
 } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { render } from "react-dom";
@@ -282,7 +283,12 @@ const KhachHangPage = () => {
           .then((response) => {
             setKhachHang([...khachHang, response.data]);
             setIsModalVisible(false);
-          });
+          }).catch((error) => {
+            notification.error({
+              message: "Lỗi thêm khách hàng",
+              description: error.message,
+              })});
+
       }
     });
   };
@@ -337,7 +343,7 @@ const KhachHangPage = () => {
             <Form.Item
               name="password"
               label="Mật khẩu"
-              rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
+              rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }, { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự" }]}
             >
               <Input.Password />
             </Form.Item>

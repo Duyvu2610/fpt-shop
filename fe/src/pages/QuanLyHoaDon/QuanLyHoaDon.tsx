@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Pagination } from "antd";
 import axios from "axios"; // Sử dụng axios để gọi API
 import { HoaDon } from "../../types/types";
+import { render } from "react-dom";
 
 const HoaDonTable: React.FC = () => {
   const [hoaDons, setHoaDons] = useState<HoaDon[]>([]);
@@ -44,15 +45,10 @@ const HoaDonTable: React.FC = () => {
       key: "khachHang",
     },
     {
-      title: "SĐT Khách Hàng",
-      dataIndex: "sdtkh",
-      key: "sdtkh",
-      render: (text: string | null) => text || "N/A",
-    },
-    {
       title: "SĐT Nhận Hàng",
       dataIndex: "sdTnhanhang",
       key: "sdTnhanhang",
+      render: (text: string) => <span >{text === "null" ? "Nhận hàng trực tiếp" : text}</span>,
     },
     {
       title: "Tổng Tiền Hàng",
@@ -61,27 +57,9 @@ const HoaDonTable: React.FC = () => {
       render: (text: number) => text.toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
     },
     {
-      title: "Khách Đã Trả",
-      dataIndex: "khachDaTra",
-      key: "khachDaTra",
-      render: (text: number) => text.toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
-    },
-    {
       title: "Phương Thức Thanh Toán",
       dataIndex: "pttt",
       key: "pttt",
-    },
-    {
-      title: "Trạng Thái",
-      dataIndex: "trangThai",
-      key: "trangThai",
-      render: (text: number) => (text === 1 ? "Đã Thanh Toán" : "Chưa Thanh Toán"),
-    },
-    {
-      title: "Loại Hóa Đơn",
-      dataIndex: "loaiHD",
-      key: "loaiHD",
-      render: (text: number) => (text === 1 ? "Hóa Đơn Bán" : "Hóa Đơn Mua"),
     },
   ];
 

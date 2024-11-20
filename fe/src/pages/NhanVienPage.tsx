@@ -97,8 +97,7 @@ const NhanVienPage: React.FC = () => {
     setLoading(true);
     try {
       const response = await axios.post<NhanVien>(
-        'https://localhost:7095/api/NhanVien/AddNhanVien',
-        newEmployee
+        `https://localhost:7095/api/NhanVien/DangKyNhanVien?ten=${newEmployee.ten}&email=${newEmployee.email}&password=111111111&sdt=${newEmployee.sdt}&diachi=${newEmployee.diaChi}`
       );
       if (response.data) {
         notification.success({
@@ -169,8 +168,9 @@ const NhanVienPage: React.FC = () => {
   ];
 
   const showEditModal = (employee: NhanVien) => {
-    setEditingEmployee(employee);
-    setModalVisible(true);
+    baseAxios.put(`NhanVien/${employee.id}?ten=${employee.ten}&email=${employee.diaChi}&password=${employee.passWord}&sdt=${employee.sdt}&diachi=${employee.diaChi}&trangthai=${employee.trangThai === 1 ? 0:1}&idvaitro=${employee.idVaiTro}`).then(() => {
+      fetchData();
+    });
   };
 
   const handleOk = () => {
@@ -248,27 +248,6 @@ const NhanVienPage: React.FC = () => {
             <Input
               value={newEmployee.diaChi}
               onChange={(e) => setNewEmployee({ ...newEmployee, diaChi: e.target.value })}
-            />
-          </Form.Item>
-          <Form.Item name="idVaiTro" label="Vai trò" rules={[{ required: true }]}>
-            <Select
-              value={newEmployee.idVaiTro}
-              onChange={(value) => setNewEmployee({ ...newEmployee, idVaiTro: value })}
-            >
-              {roles.map((role) => (
-                <Select.Option key={role.id} value={role.id}>
-                  {role.ten}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item name="trangThai" label="Trạng thái">
-            <Input
-              type="number"
-              value={newEmployee.trangThai}
-              onChange={(e) => setNewEmployee({ ...newEmployee, trangThai: +e.target.value })}
-              min={0}
-              max={1}
             />
           </Form.Item>
         </Form>

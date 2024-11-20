@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button, Table, InputNumber, Modal, Typography, Row, Col, Form, Input } from "antd";
-import axios from "axios";
 import { baseAxios } from "../../api/axios";
 
 const { Title } = Typography;
@@ -15,28 +14,29 @@ interface Product {
 }
 
 const SellingPage: React.FC = () => {
-  const [cart, setCart] = useState<Product[]>([]);  // Giỏ hàng
-  const [isModalVisible, setIsModalVisible] = useState(false);  // Modal thanh toán
-  const [totalAmount, setTotalAmount] = useState(0);  // Tổng tiền
-  const [products, setProducts] = useState<Product[]>([]);  // Danh sách sản phẩm từ API
-  const idUser : string = localStorage.getItem("userId") || ""; 
-
+  const [cart, setCart] = useState<Product[]>([]); // Giỏ hàng
+  const [isModalVisible, setIsModalVisible] = useState(false); // Modal thanh toán
+  const [totalAmount, setTotalAmount] = useState(0); // Tổng tiền
+  const [products, setProducts] = useState<Product[]>([]); // Danh sách sản phẩm từ API
+  const [searchKeyword, setSearchKeyword] = useState(""); // Từ khóa tìm kiếm
+  const idUser: string = localStorage.getItem("userId") || "";
 
   const fetchProducts = () => {
-    baseAxios.get("SanPham/GetAllChiTietSanPham")
-      .then(response => {
+    baseAxios
+      .get("SanPham/GetAllChiTietSanPham")
+      .then((response) => {
         const fetchedProducts = response.data.map((product: any) => ({
           id: product.id,
           name: product.ten,
           price: product.giaBan,
           quantity: product.soLuong,
           image: product.anh || null,
-          code: product.ma
+          code: product.ma,
         }));
         const availableProducts = fetchedProducts.filter((product: any) => product.quantity > 0);
         setProducts(availableProducts);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching products", error);
       });
   };
@@ -46,11 +46,9 @@ const SellingPage: React.FC = () => {
   }, []);
 
   const addToCart = (product: Product) => {
-    const existingProduct = cart.find(item => item.id === product.id);
+    const existingProduct = cart.find((item) => item.id === product.id);
     if (existingProduct) {
-      setCart(cart.map(item =>
-        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-      ));
+      setCart(cart.map((item) => (item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)));
     } else {
       setCart([...cart, { ...product, quantity: 1 }]);
     }
@@ -61,13 +59,11 @@ const SellingPage: React.FC = () => {
   }, [cart]);
 
   const removeFromCart = (id: string) => {
-    setCart(cart.filter(item => item.id !== id));
+    setCart(cart.filter((item) => item.id !== id));
   };
 
   const handleQuantityChange = (value: number, id: string) => {
-    setCart(cart.map(item =>
-      item.id === id ? { ...item, quantity: value } : item
-    ));
+    setCart(cart.map((item) => (item.id === id ? { ...item, quantity: value } : item)));
   };
 
   const calculateTotal = () => {
@@ -79,9 +75,6 @@ const SellingPage: React.FC = () => {
     await baseAxios.post("HoaDon/Offline/" + idUser, [
       ...cart.map((product) => ({ iDChiTietSanPham: product.id, soLuong: product.quantity, donGia: product.price })),
     ]);
-    console.log({
-      cart: cart.map((product) => ({ id: product.id, quantity: product.quantity })),
-    })
     Modal.success({
       title: "Thanh toán thành công",
       content: `Tổng cộng: ${totalAmount.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`,
@@ -89,7 +82,6 @@ const SellingPage: React.FC = () => {
     setCart([]); // Xóa giỏ hàng sau khi thanh toán
     setTotalAmount(0);
     fetchProducts();
-
   };
 
   const columns = [
@@ -109,20 +101,15 @@ const SellingPage: React.FC = () => {
       dataIndex: "quantity",
       key: "quantity",
       render: (text: number, record: Product) => (
-        <InputNumber
-          min={1}
-          value={text}
-          onChange={(value) => handleQuantityChange(value ?? 1, record.id)}
-        />
+        <InputNumber min={1} value={text} onChange={(value) => handleQuantityChange(value ?? 1, record.id)} />
       ),
     },
     {
       title: "Tổng",
       dataIndex: "total",
       key: "total",
-      render: (text: any, record: Product) => (
-        (record.price * record.quantity).toLocaleString("vi-VN", { style: "currency", currency: "VND" })
-      ),
+      render: (_: any, record: Product) =>
+        (record.price * record.quantity).toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
     },
     {
       title: "Hành động",
@@ -135,13 +122,26 @@ const SellingPage: React.FC = () => {
     },
   ];
 
+  // Lọc sản phẩm dựa trên từ khóa tìm kiếm
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchKeyword.toLowerCase())
+  );
+
   return (
     <div style={{ padding: "20px" }}>
+      {/* Ô tìm kiếm */}
+      <Input
+        placeholder="Tìm kiếm sản phẩm theo tên..."
+        value={searchKeyword}
+        onChange={(e) => setSearchKeyword(e.target.value)}
+        style={{ marginBottom: "20px", width: "300px" }}
+      />
+
+      {/* Danh sách sản phẩm */}
       <Row gutter={16}>
-        {/* Danh sách sản phẩm */}
         <div style={{ maxHeight: "400px", overflowY: "auto", overflowX: "hidden" }}>
           <Row gutter={16}>
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <Col span={8} key={product.id}>
                 <Card
                   title={product.name + " - " + product.code}
@@ -175,29 +175,6 @@ const SellingPage: React.FC = () => {
           </div>
         )}
       />
-
-      {/* Modal thanh toán */}
-      <Modal
-        title="Thanh Toán"
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={null}
-      >
-        <Form layout="vertical">
-          <Form.Item label="Tên khách hàng">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Phương thức thanh toán">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Tổng tiền">
-            <Input value={totalAmount.toLocaleString("vi-VN", { style: "currency", currency: "VND" })} readOnly />
-          </Form.Item>
-          <Button type="primary" onClick={handlePayment}>
-            Xác nhận thanh toán
-          </Button>
-        </Form>
-      </Modal>
     </div>
   );
 };

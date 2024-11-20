@@ -19,7 +19,7 @@ export interface Product {
   trangThaiKM: number | null;
   giaTriKM: number | null;
   soSao: number | undefined;
-  mota: string;
+  moTa: string;
 }
 
 export interface Review {
@@ -147,6 +147,9 @@ export interface SignUpInfo {
   name: string;
   email: string; 
   password: string; 
+  gender: string,
+  address: string,
+  phone: string,
 }
 
 export interface InputFieldProps {
@@ -335,4 +338,11 @@ interface SanPhamTuongTu {
   tenSP: string;
   duongDanSPTT: string;
   giaSPTT: number;
+}
+
+export interface MailData {
+  emailToId: string;
+  emailToName: string;
+  emailSubject: string;
+  emailBody: string;
 }

@@ -80,7 +80,7 @@ function ProductDetail(_props: Props) {
   useEffect(() => {
     const fetchData = async () => {
       const result: Product[] = await callApi(() =>
-        getAllProduct("00000000-0000-0000-0000-000000000000")
+        getAllProduct()
       );
       result.sort((a, b) => {
         return new Date(b.ngayTao).getTime() - new Date(a.ngayTao).getTime();
@@ -198,7 +198,7 @@ function ProductDetail(_props: Props) {
                   </ul>
                 </p>
 
-                <p className="text-[#003b31] font-semibold pb-4 flex gap-2 items-center">
+                <p className="text-[#003b31] font-semibold pb-4 flex gap-2 items-center text-sm">
                   Kích thước
                   <ul className="flex gap-2">
                     {chiTietSanPham?.kichCos.map((kichCo) => (
@@ -273,7 +273,7 @@ function ProductDetail(_props: Props) {
           className="transition-all max-w-[400px] mx-auto duration-500 overflow-hidden max-h-[100px]"
         >
           {data ? (
-            <Markdown className={`py-4 border-b`}>{data.mota}</Markdown>
+            <Markdown className={`py-4 border-b`}>{data.moTa}</Markdown>
           ) : (
             <div className="animate-gradient w-full h-40 bg-[#d2d2d2] rounded-lg"></div>
           )}

@@ -2,7 +2,7 @@ import axios from "axios";
 import { getDispatch } from "../utils/helper";
 import { fetchEnd, fetchStart } from "../redux/appSlice";
 
-import { Login, SignUpInfo, Cart, CartItem, ReviewRequestDto, CartRequestDto, GetUserInfoDto, CardInfo, Review, Product, GetCartReponseDto } from "../types/types";
+import { Login, SignUpInfo, Cart, CartItem, ReviewRequestDto, CartRequestDto, GetUserInfoDto, CardInfo, Review, Product, GetCartReponseDto, MailData } from "../types/types";
 import { logOutSuccess, loginSuccess } from "../redux/authSlice";
 import Swal from "sweetalert2";
 
@@ -45,9 +45,9 @@ export const logoutUser = async () => {
   }
 };
 
-export const forgotPass = async (email: string) => {
+export const forgotPass = async (email: MailData) => {
   try {
-    await baseAxios.get(`/auth/forgot-pass/${email}`);
+    await baseAxios.post(`/Mail/SendMail`, email);
   } catch (error) {
     throw error;
   }
@@ -102,9 +102,9 @@ export const updateCartItem = async (
   }
 };
 
-export const getAllProduct = async (idLoai: string|null): Promise<Product[]> => {
+export const getAllProduct = async (): Promise<Product[]> => {
   try {
-    const res = await baseAxios.get("SanPham/getAll", { params: { idLoai } });
+    const res = await baseAxios.get("SanPham/getAll");
     const products: Product[] = res.data;
     // Filter out products with duplicate IDs
     const uniqueProducts = products.reduce((acc: Product[], current: Product) => {

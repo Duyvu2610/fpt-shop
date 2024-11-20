@@ -18,6 +18,7 @@ function AdminLayout({ children }: DefaultLayoutProps) {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("");
   const navigate = useNavigate();
+  const roleNhanVien : boolean= localStorage.getItem("role") === "NhanVien";
 
   const handleLogout = () => {
     Swal.fire({
@@ -141,7 +142,7 @@ function AdminLayout({ children }: DefaultLayoutProps) {
                 Quản lý hóa đơn
               </a>
             </li>
-            <li>
+            {!roleNhanVien && (<li>
               <a
                 href="/admin/san-pham"
                 className={`py-3 hover:bg-[#f6f9ff] hover:text-[#4154f1] ${
@@ -151,8 +152,8 @@ function AdminLayout({ children }: DefaultLayoutProps) {
                 <BsJournalText size={16} />
                 Quản lý sản phẩm
               </a>
-            </li>
-            <li>
+            </li>)}
+            {!roleNhanVien && (<li>
               <details open>
                 <summary className="py-3 hover:bg-[#f6f9ff] hover:text-[#4154f1]">
                   <BsReverseLayoutTextWindowReverse size={16} />
@@ -201,7 +202,7 @@ function AdminLayout({ children }: DefaultLayoutProps) {
                   </li>
                 </ul>
               </details>
-            </li>
+            </li>)}
             <li>
               <details open>
                 <summary className="py-3 hover:bg-[#f6f9ff] hover:text-[#4154f1]">
@@ -209,7 +210,7 @@ function AdminLayout({ children }: DefaultLayoutProps) {
                   Quản lý người dùng
                 </summary>
                 <ul>
-                  <li>
+                  {!roleNhanVien && (<li>
                     <a
                       href="/admin/nhan-vien"
                       className={`py-3 hover:bg-[#f6f9ff] hover:text-[#4154f1] ${
@@ -218,7 +219,7 @@ function AdminLayout({ children }: DefaultLayoutProps) {
                     >
                       Quản lý nhân viên
                     </a>
-                  </li>
+                  </li>)}
                   <li>
                     <a
                       href="/admin/khach-hang"

@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/authSlice";
 import routes from "../config/routes";
-
+import { notification } from "antd";
 
 interface Errors {
   [key: string]: string;
@@ -45,7 +45,12 @@ function LoginPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (role === "1") {
+
+    if (validate()) {
+      setFormValues({
+        email: "",
+        password: "",
+      });
       try {
         const res = await baseAxios.get("/QuanLyNguoiDung/DangNhap", {
           params: {
@@ -53,29 +58,28 @@ function LoginPage() {
             password: formValues.password,
           },
         });
-        localStorage.setItem("role", "admin");
-        localStorage.setItem("userId", res.data.id);
         toast.success("Đăng nhập thành công");
-        setTimeout(() => {
-          window.location.href = "/admin/ban-hang";
-        }, 1000);
-        
-      } catch (err) {
-        toast.error("Đăng nhập thất bại");
-      }
-    } else {
-      if (validate()) {
-        setFormValues({
-          email: "",
-          password: "",
-        });
-        try {
-          const data = await callApi(() => loginUser(formValues));
-          dispatch(loginSuccess(data));
-          navigate(routes.home);
-        } catch (error) {
-          toast.error("Đăng nhập thất bại");
+        localStorage.clear();
+        localStorage.setItem("userId", res.data.id);
+        if (res.data.vaiTro === 0) {
+          localStorage.setItem("role", "admin");
+          setTimeout(() => {
+            window.location.href = "/admin/ban-hang";
+          }, 1000);
+        } else if (res.data.vaiTro === 2) {
+          localStorage.setItem("role", "NhanVien");
+          setTimeout(() => {
+            window.location.href = "/admin/ban-hang";
+          }, 1000);
+        } else {
+          
+          setTimeout(() => {
+            navigate(routes.home);
+          }, 1000);
+          
         }
+      } catch (error) {
+        toast.error("Đăng nhập thất bại");
       }
     }
   };
@@ -94,13 +98,9 @@ function LoginPage() {
         <div>
           <h2 className="text-3xl font-extrabold">Đăng nhập</h2>
           <p className="text-sm text-gray-400 mt-3">
-          Đăng nhập để tiếp tục sử dụng dịch vụ của chúng tôi
+            Đăng nhập để tiếp tục sử dụng dịch vụ của chúng tôi
           </p>
           <form onSubmit={handleSubmit}>
-            <select value={role} onChange={(e) => setRole(e.target.value)}>
-              <option value="1">Admin</option>
-              <option value="2">User</option>
-            </select>
             <div className="space-y-4 mt-8">
               <input
                 type="text"
@@ -140,7 +140,12 @@ function LoginPage() {
               )}
             </div>
             <div className="text-end mt-2">
-              <button onClick={() => navigate(routes["forgot-pass"])} className="hover:text-primary">Quên mật khẩu ?</button>
+              <button
+                onClick={() => navigate(routes["forgot-pass"])}
+                className="hover:text-primary"
+              >
+                Quên mật khẩu ?
+              </button>
             </div>
             <button
               type="submit"
@@ -149,9 +154,9 @@ function LoginPage() {
               Đăng nhập
             </button>
             <p className="pt-4 text-center">
-            Bạn chưa có tài khoản?{" "}
+              Bạn chưa có tài khoản?{" "}
               <Link to={"/signup"} className="text-primary hover:underline">
-              Đăng ký
+                Đăng ký
               </Link>
             </p>
           </form>

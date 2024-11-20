@@ -16,7 +16,7 @@ const TopSelling: React.FC = () => {
     const {t} = useTranslation();
     useEffect(() => {
       const fetchData = async () => {
-          const result: Product[] = await callApi(() => getAllProduct("00000000-0000-0000-0000-000000000000"));
+          const result: Product[] = await callApi(() => getAllProduct());
           result.sort((a, b) => {
               return b.giaGoc - a.giaGoc;
           });

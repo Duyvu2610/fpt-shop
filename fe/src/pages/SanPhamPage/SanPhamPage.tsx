@@ -227,6 +227,7 @@ const SanPhamPage: React.FC = () => {
           tenChatLieu: editingProduct.chatLieu,
           tenLoaiSPCha: editingProduct.loaiSPCha,
           tenLoaiSPCon: editingProduct.loaiSPCon,
+          trangThai: editingProduct.trangThai,
         });
         notification.success({
           message: "Cập nhật sản phẩm thành công",
@@ -334,9 +335,9 @@ const SanPhamPage: React.FC = () => {
           <Button danger onClick={() => handleDelete(record)} className="mr-2">
             Xóa
           </Button>
-          <Button onClick={() => handleShowUpdate(record)}>
+          {/* <Button onClick={() => handleShowUpdate(record)}>
             Chi tiết
-          </Button>
+          </Button> */}
         </>
       ),
     },
@@ -520,6 +521,7 @@ const SanPhamPage: React.FC = () => {
         visible={isShowAddDetailModal}
         onClose={() => setIsShowAddDetailModal(false)}
         data={sanPhamChiTiet}
+        onSave={fetchProducts}
       />
 
       {/* Modal sửa sản phẩm */}
@@ -596,6 +598,18 @@ const SanPhamPage: React.FC = () => {
                     {cl.ten}
                   </Select.Option>
                 ))}
+              </Select>
+            </Form.Item>
+            <Form.Item label="Trạng thái" required>
+              <Select
+                value={editingProduct.trangThai}
+                onChange={(value) =>
+                  setEditingProduct({ ...editingProduct, trangThai: value })
+                }
+                virtual={false}
+              >
+                <Select.Option value={1}>Hoạt động</Select.Option>
+                <Select.Option value={0}>Không hoạt động</Select.Option>
               </Select>
             </Form.Item>
           </Form>
